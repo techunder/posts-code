@@ -39,6 +39,7 @@ X = np.column_stack([
 
 # == 5. Calculate actual lifespan: y = b + X·w + random noise (std=3, simulate individual differences)
 y = true_b + np.dot(X, true_w)
+#y = true_b + np.dot(X, true_w) + np.random.normal(0, 3, n_samples)
 
 # == 6. Wrap into DataFrame and save
 data = pd.DataFrame({
@@ -60,27 +61,3 @@ print("\nFirst 5 Rows of the Dataset:")
 print(data.head())
 print("\nDataset Descriptive Statistics:")
 print(data.describe())
-
-
-
-# debug ============================================================
-## 添加截距项（全1列）
-X_with_bias = np.column_stack([np.ones(len(X)), X])
-
-## 计算(X^T X)的逆矩阵
-X_T = X_with_bias.T
-X_T_X = X_T @ X_with_bias
-
-## 检查矩阵是否可逆（科普用）
-if np.linalg.matrix_rank(X_T_X) != X_T_X.shape[0]:
-    raise ValueError("X^TX矩阵不可逆，无法计算解析解！")
-
-# 计算最优参数
-theta = np.linalg.inv(X_T_X) @ X_T @ y
-
-w = theta[:-1]  # 权重项
-b = theta[-1]  # 截距项
-
-print("\n===== 解析解求解结果 =====")
-print(f"解析解截距b：{b:.4f}（真实值：{true_b}）")
-print(f"解析解权重w：{np.round(w, 4)}（真实值：{true_w}）")
