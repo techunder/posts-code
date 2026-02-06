@@ -11,13 +11,13 @@ np.random.seed(42)
 n_samples = 1000
 
 # == 2. Generate 7 independent variables (simulate according to authoritative ranges)
-parent_lifespan = np.round(np.random.normal(75, 5, n_samples), decimals=1)  # Parent average lifespan: 75±5 years
-gender = np.random.randint(0, 2, n_samples)                                 # Gender: 0=male, 1=female
-exercise_hours = np.round(np.random.uniform(0, 10, n_samples), decimals=1)  # Weekly exercise duration: 0-10 hours
-smoking = np.random.randint(0, 2, n_samples)                                # Smoking: 0=non-smoker, 1=smoker
-diet_health = np.random.randint(0, 2, n_samples)                            # Diet health: 0=unhealthy, 1=healthy
-sleep_hours = np.round(np.random.uniform(5, 9, n_samples), decimals=1)      # Daily sleep duration: 5-9 hours
-stress_level = np.random.randint(0, 3, n_samples)                           # Stress level: 0=high, 1=moderate, 2=low
+parent_lifespan = np.random.normal(75, 5, n_samples)  # Parent average lifespan: 75±5 years
+gender = np.random.randint(0, 2, n_samples)           # Gender: 0=male, 1=female
+exercise_hours = np.random.uniform(0, 10, n_samples)  # Weekly exercise duration: 0-10 hours
+smoking = np.random.randint(0, 2, n_samples)          # Smoking: 0=non-smoker, 1=smoker
+diet_health = np.random.randint(0, 2, n_samples)      # Diet health: 0=unhealthy, 1=healthy
+sleep_hours = np.random.uniform(5, 9, n_samples)      # Daily sleep duration: 5-9 hours
+stress_level = np.random.randint(0, 3, n_samples)     # Stress level: 0=high, 1=moderate, 2=low
 
 # == 3. Set true weights (core parameters)
 true_b = 10  # Base lifespan value
@@ -36,9 +36,9 @@ X = np.column_stack([
     parent_lifespan, gender, exercise_hours, 
     smoking, diet_health, sleep_hours, stress_level
 ])
+
 # == 5. Calculate actual lifespan: y = b + X·w + random noise (std=3, simulate individual differences)
-y = true_b + np.dot(X, true_w) + np.random.normal(0, 3, n_samples)
-y = np.round(y, decimals=0)
+y = true_b + np.dot(X, true_w)
 
 # == 6. Wrap into DataFrame and save
 data = pd.DataFrame({
@@ -60,3 +60,27 @@ print("\nFirst 5 Rows of the Dataset:")
 print(data.head())
 print("\nDataset Descriptive Statistics:")
 print(data.describe())
+
+
+
+# debug ============================================================
+## 添加截距项（全1列）
+X_with_bias = np.column_stack([np.ones(len(X)), X])
+
+## 计算(X^T X)的逆矩阵
+X_T = X_with_bias.T
+X_T_X = X_T @ X_with_bias
+
+## 检查矩阵是否可逆（科普用）
+if np.linalg.matrix_rank(X_T_X) != X_T_X.shape[0]:
+    raise ValueError("X^TX矩阵不可逆，无法计算解析解！")
+
+# 计算最优参数
+theta = np.linalg.inv(X_T_X) @ X_T @ y
+
+w = theta[:-1]  # 权重项
+b = theta[-1]  # 截距项
+
+print("\n===== 解析解求解结果 =====")
+print(f"解析解截距b：{b:.4f}（真实值：{true_b}）")
+print(f"解析解权重w：{np.round(w, 4)}（真实值：{true_w}）")
