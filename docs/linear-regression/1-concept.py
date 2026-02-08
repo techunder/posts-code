@@ -3,10 +3,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Set random seed for reproducibility
+np.random.seed(42)
+
 plt.rcParams['axes.unicode_minus'] = False  # fix minus display issue
 
 # == 1. Generate Simulated Data Fitting WHO Standard
-np.random.seed(42)  # fix random seed for reproducibility
 n_people = 200      # 200 samples
 max_exercise = 5    # WHO recommended upper limit for moderate intensity exercise: 5 hours/week (300 minutes)
 mean_exercise = 2.5 # WHO base recommendation for moderate intensity exercise: 2.5 hours/week (150 minutes)
